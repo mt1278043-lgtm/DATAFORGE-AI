@@ -11,6 +11,7 @@ import {
   BarChart3,
   BookOpen,
   Network,
+  Play,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -95,6 +96,13 @@ export const DASHBOARD_NAV: NavItem[] = [
     href: "/dashboard/story",
     icon: BookOpen,
     description: "Visual narrative of your data insights",
+  },
+  {
+    label: "Interactive Demo",
+    href: "/dashboard/demo",
+    icon: Play,
+    description: "See DataForge in action",
+    badge: "NEW",
   },
   {
     label: "Settings",
