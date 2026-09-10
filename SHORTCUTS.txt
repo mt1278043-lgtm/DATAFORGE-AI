@@ -1,0 +1,5 @@
+This folder is the DataForge AI project.
+
+Open in File Explorer.bat   -> opens this folder in Windows File Explorer
+Start DataForge.bat         -> installs dependencies and starts the dev server
+DATAFORGE AI Folder.url     -> desktop shortcut to this folder (may open via your default file handler)
