@@ -33,7 +33,9 @@
   }
 
   body {
-    @apply bg-base text-ink font-sans antialiased;
+    @apply font-sans antialiased;
+    background-color: rgb(5 7 13);
+    color: rgb(234 240 255);
     background-image:
       radial-gradient(60rem 60rem at 12% -12%, rgba(34, 211, 238, 0.09), transparent 60%),
       radial-gradient(50rem 50rem at 92% 0%, rgba(139, 92, 246, 0.12), transparent 60%),
@@ -89,7 +91,8 @@
   }
 
   .glass-hover {
-    @apply transition-all duration-500 ease-premium hover:border-white/[0.14] hover:bg-white/[0.045];
+    @apply transition-all duration-500 hover:border-white/[0.14] hover:bg-white/[0.045];
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /* Hairline gradient top edge used on premium cards */
@@ -117,7 +120,10 @@
   }
 
   .eyebrow {
-    @apply text-2xs font-semibold uppercase tracking-[0.28em] text-ink-faint;
+    @apply font-semibold uppercase tracking-[0.28em];
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    color: rgb(97 110 144);
   }
 
   /* --- Decorative -------------------------------------------------------- */

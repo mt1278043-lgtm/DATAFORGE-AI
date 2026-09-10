@@ -132,3 +132,5 @@ export function useDataset(): DatasetContextValue {
   if (!context) throw new Error("useDataset must be used inside <DatasetProvider>.");
   return context;
 }
+
+export { DatasetContext };

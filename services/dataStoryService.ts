@@ -55,7 +55,7 @@ export function generateDataStory(
     chapters.push({
       id: `insight-${idx}`,
       title: insight.title,
-      description: insight.description,
+      description: insight.summary,
       metric: insight.title,
       confidence: Math.min(Math.round(insight.confidence * 100), 99),
       evidence: insight.evidence || [],
@@ -64,7 +64,7 @@ export function generateDataStory(
   });
 
   // Chapter 5: Recommendations
-  if (insights.some((i) => i.type === "opportunity")) {
+  if (insights.some((i) => i.category === "opportunity")) {
     chapters.push({
       id: "recommendations",
       title: "Key Opportunities",
