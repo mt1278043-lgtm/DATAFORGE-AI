@@ -1,223 +1,521 @@
 "use client";
 
-import { KeyRound, RotateCcw, Server, Settings as SettingsIcon, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Settings,
+  Bell,
+  Lock,
+  Zap,
+  Database,
+  Upload,
+  Eye,
+  Moon,
+  Monitor,
+  Save,
+  RotateCw,
+} from "lucide-react";
 
-import { PageHeader } from "@/components/dashboard/PageHeader";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Card, CardBody, CardHeader } from "@/components/ui/Card";
-import { Switch } from "@/components/ui/Switch";
-import { useAiStatus } from "@/hooks/useAiStatus";
-import { useDataset } from "@/hooks/useDataset";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { useToast } from "@/hooks/useToast";
-import { LIMITS } from "@/lib/constants";
-import { formatBytes } from "@/lib/format";
+interface SettingsSection {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  description: string;
+}
 
-const ENV_VARS = [
+const SETTINGS_SECTIONS: SettingsSection[] = [
   {
-    name: "OPENAI_API_KEY",
-    description: "Server-side key for the AI assistant and narratives. Empty enables demo mode.",
-    required: false,
+    id: "general",
+    label: "General",
+    icon: <Settings className="w-5 h-5" />,
+    description: "Basic app settings",
   },
   {
-    name: "OPENAI_MODEL",
-    description: "Overrides the default model (gpt-4o-mini).",
-    required: false,
+    id: "ai",
+    label: "AI Engine",
+    icon: <Zap className="w-5 h-5" />,
+    description: "AI model configuration",
   },
   {
-    name: "NEXT_PUBLIC_SUPABASE_URL",
-    description: "Reserved for dataset persistence in a future release.",
-    required: false,
+    id: "data",
+    label: "Data & Privacy",
+    icon: <Database className="w-5 h-5" />,
+    description: "Data handling preferences",
   },
   {
-    name: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    description: "Reserved for dataset persistence in a future release.",
-    required: false,
+    id: "notifications",
+    label: "Notifications",
+    icon: <Bell className="w-5 h-5" />,
+    description: "Alert preferences",
+  },
+  {
+    id: "display",
+    label: "Display",
+    icon: <Eye className="w-5 h-5" />,
+    description: "Visual preferences",
+  },
+  {
+    id: "security",
+    label: "Security",
+    icon: <Lock className="w-5 h-5" />,
+    description: "Security settings",
   },
 ];
 
-export default function SettingsPage() {
-  const { status, loading } = useAiStatus();
-  const { dataset, resetToDemo } = useDataset();
-  const toast = useToast();
+interface Settings {
+  general: {
+    appName: string;
+    autoSave: boolean;
+    dataRetention: "30days" | "90days" | "1year" | "forever";
+  };
+  ai: {
+    engine: "openai" | "local";
+    confidenceThreshold: number;
+    enableAutoInsights: boolean;
+    detailedAnalysis: boolean;
+  };
+  data: {
+    allowDataCollection: boolean;
+    allowAnalytics: boolean;
+    exportFormat: "json" | "csv" | "both";
+  };
+  notifications: {
+    emailNotifications: boolean;
+    insightAlerts: boolean;
+    analysisComplete: boolean;
+  };
+  display: {
+    theme: "light" | "dark" | "system";
+    compact: boolean;
+    animations: boolean;
+  };
+  security: {
+    twoFactorAuth: boolean;
+    sessionTimeout: number;
+    dataEncryption: boolean;
+  };
+}
 
-  const [animations, setAnimations] = useLocalStorage("df.animations", true);
-  const [compactTables, setCompactTables] = useLocalStorage("df.compactTables", false);
-  const [autoInsights, setAutoInsights] = useLocalStorage("df.autoInsights", true);
-  const [notifications, setNotifications] = useLocalStorage("df.notifications", true);
+export default function SettingsPage() {
+  const [activeSection, setActiveSection] = useState<string>("general");
+  const [hasChanges, setHasChanges] = useState(false);
+
+  const [settings, setSettings] = useState<Settings>({
+    general: {
+      appName: "DataForge AI",
+      autoSave: true,
+      dataRetention: "1year",
+    },
+    ai: {
+      engine: "local",
+      confidenceThreshold: 75,
+      enableAutoInsights: true,
+      detailedAnalysis: true,
+    },
+    data: {
+      allowDataCollection: true,
+      allowAnalytics: true,
+      exportFormat: "both",
+    },
+    notifications: {
+      emailNotifications: true,
+      insightAlerts: true,
+      analysisComplete: true,
+    },
+    display: {
+      theme: "dark",
+      compact: false,
+      animations: true,
+    },
+    security: {
+      twoFactorAuth: false,
+      sessionTimeout: 30,
+      dataEncryption: true,
+    },
+  });
+
+  const handleSettingChange = (section: keyof Settings, key: string, value: any) => {
+    setSettings((prev) => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [key]: value,
+      },
+    }));
+    setHasChanges(true);
+  };
+
+  const handleSave = () => {
+    setHasChanges(false);
+    // TODO: Save settings to backend
+  };
+
+  const handleReset = () => {
+    setHasChanges(false);
+    // TODO: Reset to saved settings
+  };
 
   return (
-    <>
-      <PageHeader
-        eyebrow="Settings"
-        title="Workspace settings"
-        description="Configure the AI engine, workspace preferences and the environment this instance is running with."
-      />
+    <div className="min-h-screen bg-base p-4 sm:p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+          <h1 className="text-4xl font-bold text-white">Settings</h1>
+          <p className="text-lg text-ink-muted">Customize your DataForge experience</p>
+        </motion.div>
 
-      <section className="grid gap-5 xl:grid-cols-2">
-        {/* AI engine ------------------------------------------------------- */}
-        <Card highlight>
-          <CardHeader
-            icon={<Sparkles className="h-4 w-4" />}
-            title="AI engine"
-            description="How DataForge answers questions and writes narratives"
-            actions={
-              <Badge tone={status.mode === "openai" ? "success" : "violet"} dot pulse>
-                {loading ? "Checking..." : status.label}
-              </Badge>
-            }
-          />
-          <CardBody className="space-y-4">
-            <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-[13px] font-medium text-ink">Active provider</p>
-                <span className="text-[13px] text-ink-muted">
-                  {status.mode === "openai" ? "OpenAI" : "Local demo engine"}
-                </span>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <p className="text-[13px] font-medium text-ink">Model</p>
-                <span className="font-mono text-[12.5px] text-brand-cyan">
-                  {status.model ?? "deterministic-analyst-v1"}
-                </span>
-              </div>
-            </div>
-
-            <p className="text-[13px] leading-relaxed text-ink-muted">
-              {status.mode === "openai"
-                ? "An OpenAI key is configured on the server. Questions are answered with your dataset profile as context - the raw rows never leave your browser, and the key is never sent to the client."
-                : "No OpenAI key is configured, so DataForge runs its built-in analyst. Every answer is computed from your dataset profile. Add OPENAI_API_KEY to .env.local and restart the dev server to enable open-ended conversation."}
-            </p>
-
-            <div className="flex items-start gap-3 rounded-2xl border border-brand-cyan/20 bg-brand-cyan/[0.05] p-4">
-              <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-brand-cyan" />
-              <p className="text-[12.5px] leading-relaxed text-ink-muted">
-                Keys are read server-side only, inside route handlers. Never place a secret in a
-                variable prefixed with <span className="font-mono text-brand-cyan">NEXT_PUBLIC_</span> -
-                those are inlined into the browser bundle.
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-
-        {/* Preferences ----------------------------------------------------- */}
-        <Card>
-          <CardHeader
-            icon={<SettingsIcon className="h-4 w-4" />}
-            title="Preferences"
-            description="Stored locally in this browser"
-          />
-          <CardBody className="space-y-5">
-            <Switch
-              checked={animations}
-              onChange={setAnimations}
-              label="Interface animations"
-              description="Page transitions, chart reveals and hover motion."
-            />
-            <div className="divider" />
-            <Switch
-              checked={compactTables}
-              onChange={setCompactTables}
-              label="Compact tables"
-              description="Tighter row height in the data preview."
-            />
-            <div className="divider" />
-            <Switch
-              checked={autoInsights}
-              onChange={setAutoInsights}
-              label="Generate insights on upload"
-              description="Run the detector suite as soon as a dataset is profiled."
-            />
-            <div className="divider" />
-            <Switch
-              checked={notifications}
-              onChange={setNotifications}
-              label="Toast notifications"
-              description="Confirmations for uploads, exports and cleaning."
-            />
-          </CardBody>
-        </Card>
-
-        {/* Environment ----------------------------------------------------- */}
-        <Card>
-          <CardHeader
-            icon={<Server className="h-4 w-4" />}
-            title="Environment"
-            description="Variables read from .env.local"
-          />
-          <CardBody className="space-y-3">
-            {ENV_VARS.map((variable) => (
-              <div
-                key={variable.name}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+        {/* Settings Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-2">
+            {SETTINGS_SECTIONS.map((section, idx) => (
+              <motion.button
+                key={section.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                onClick={() => setActiveSection(section.id)}
+                className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                  activeSection === section.id
+                    ? "bg-brand-cyan/20 border border-brand-cyan/50 text-white"
+                    : "hover:bg-white/10 text-ink-muted"
+                }`}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-[12.5px] text-ink">{variable.name}</span>
-                  <Badge tone={variable.required ? "warning" : "neutral"}>
-                    {variable.required ? "Required" : "Optional"}
-                  </Badge>
+                <div className="flex items-center gap-3">
+                  <span className={activeSection === section.id ? "text-brand-cyan" : ""}>
+                    {section.icon}
+                  </span>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{section.label}</p>
+                    <p className="text-xs opacity-70">{section.description}</p>
+                  </div>
                 </div>
-                <p className="mt-1.5 text-[12px] leading-relaxed text-ink-faint">
-                  {variable.description}
-                </p>
-              </div>
+              </motion.button>
             ))}
-            <p className="text-[12px] text-ink-faint">
-              Values are never displayed here - only whether the AI engine resolved to OpenAI or demo
-              mode.
-            </p>
-          </CardBody>
-        </Card>
+          </div>
 
-        {/* Workspace ------------------------------------------------------- */}
-        <Card>
-          <CardHeader
-            icon={<RotateCcw className="h-4 w-4" />}
-            title="Workspace"
-            description="Current session and limits"
-          />
-          <CardBody className="space-y-4">
-            <dl className="grid grid-cols-2 gap-4">
-              {[
-                { label: "Active dataset", value: dataset.meta.name },
-                { label: "Source", value: dataset.meta.source === "demo" ? "Demo" : "Uploaded" },
-                { label: "Rows in memory", value: dataset.rowCount.toLocaleString() },
-                { label: "Columns", value: String(dataset.columnCount) },
-                { label: "Max upload size", value: formatBytes(LIMITS.maxFileSizeBytes) },
-                { label: "Row cap", value: LIMITS.maxRowsInMemory.toLocaleString() },
-              ].map((item) => (
-                <div key={item.label} className="min-w-0">
-                  <dt className="text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-                    {item.label}
-                  </dt>
-                  <dd className="mt-1 truncate text-[13.5px] text-ink" title={item.value}>
-                    {item.value}
-                  </dd>
+          {/* Content */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* General Settings */}
+            {activeSection === "general" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-8 space-y-6"
+              >
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-6">General Settings</h2>
+
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block">
+                        <span className="text-sm font-semibold text-white mb-2 block">App Name</span>
+                        <input
+                          type="text"
+                          value={settings.general.appName}
+                          onChange={(e) =>
+                            handleSettingChange("general", "appName", e.target.value)
+                          }
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-brand-cyan focus:outline-none"
+                        />
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.general.autoSave}
+                          onChange={(e) =>
+                            handleSettingChange("general", "autoSave", e.target.checked)
+                          }
+                          className="w-5 h-5 rounded"
+                        />
+                        <span className="text-white font-medium">Auto-save Changes</span>
+                      </label>
+                      <p className="text-xs text-ink-muted mt-1 ml-8">
+                        Automatically save changes without confirmation
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block">
+                        <span className="text-sm font-semibold text-white mb-2 block">
+                          Data Retention Policy
+                        </span>
+                        <select
+                          value={settings.general.dataRetention}
+                          onChange={(e) =>
+                            handleSettingChange("general", "dataRetention", e.target.value)
+                          }
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-brand-cyan focus:outline-none"
+                        >
+                          <option value="30days">30 Days</option>
+                          <option value="90days">90 Days</option>
+                          <option value="1year">1 Year</option>
+                          <option value="forever">Forever</option>
+                        </select>
+                      </label>
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </dl>
+              </motion.div>
+            )}
 
-            <div className="divider" />
+            {/* AI Engine Settings */}
+            {activeSection === "ai" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-8 space-y-6"
+              >
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-6">AI Engine Configuration</h2>
 
-            <div className="flex flex-wrap gap-2.5">
-              <Button
-                variant="secondary"
-                icon={<RotateCcw className="h-4 w-4" />}
-                onClick={resetToDemo}
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block">
+                        <span className="text-sm font-semibold text-white mb-2 block">AI Engine</span>
+                        <select
+                          value={settings.ai.engine}
+                          onChange={(e) => handleSettingChange("ai", "engine", e.target.value)}
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-brand-cyan focus:outline-none"
+                        >
+                          <option value="local">Local (Default)</option>
+                          <option value="openai">OpenAI GPT-4</option>
+                        </select>
+                        <p className="text-xs text-ink-muted mt-2">
+                          Local mode works offline. OpenAI mode requires API key.
+                        </p>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block">
+                        <span className="text-sm font-semibold text-white mb-2 block">
+                          Confidence Threshold: {settings.ai.confidenceThreshold}%
+                        </span>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={settings.ai.confidenceThreshold}
+                          onChange={(e) =>
+                            handleSettingChange(
+                              "ai",
+                              "confidenceThreshold",
+                              Number(e.target.value)
+                            )
+                          }
+                          className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
+                        />
+                        <p className="text-xs text-ink-muted mt-2">
+                          Only show insights with confidence above this threshold
+                        </p>
+                      </label>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.ai.enableAutoInsights}
+                          onChange={(e) =>
+                            handleSettingChange("ai", "enableAutoInsights", e.target.checked)
+                          }
+                          className="w-5 h-5 rounded"
+                        />
+                        <span className="text-white font-medium">Auto-generate Insights</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.ai.detailedAnalysis}
+                          onChange={(e) =>
+                            handleSettingChange("ai", "detailedAnalysis", e.target.checked)
+                          }
+                          className="w-5 h-5 rounded"
+                        />
+                        <span className="text-white font-medium">Enable Detailed Analysis</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Display Settings */}
+            {activeSection === "display" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-8 space-y-6"
               >
-                Restore demo dataset
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => toast.info("Nothing to clear", "Datasets live only in this session.")}
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-6">Display Preferences</h2>
+
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block">
+                        <span className="text-sm font-semibold text-white mb-2 block">Theme</span>
+                        <div className="grid grid-cols-3 gap-3">
+                          {(
+                            [
+                              { value: "light", label: "Light", icon: null },
+                              { value: "dark", label: "Dark", icon: null },
+                              { value: "system", label: "System", icon: null },
+                            ] as const
+                          ).map((theme) => (
+                            <button
+                              key={theme.value}
+                              onClick={() => handleSettingChange("display", "theme", theme.value)}
+                              className={`px-4 py-3 rounded-lg border-2 font-medium transition ${
+                                settings.display.theme === theme.value
+                                  ? "border-brand-cyan bg-brand-cyan/10 text-white"
+                                  : "border-white/10 text-ink-muted hover:border-white/20"
+                              }`}
+                            >
+                              {theme.label}
+                            </button>
+                          ))}
+                        </div>
+                      </label>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.display.compact}
+                          onChange={(e) =>
+                            handleSettingChange("display", "compact", e.target.checked)
+                          }
+                          className="w-5 h-5 rounded"
+                        />
+                        <span className="text-white font-medium">Compact View</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.display.animations}
+                          onChange={(e) =>
+                            handleSettingChange("display", "animations", e.target.checked)
+                          }
+                          className="w-5 h-5 rounded"
+                        />
+                        <span className="text-white font-medium">Enable Animations</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Security Settings */}
+            {activeSection === "security" && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-8 space-y-6"
               >
-                Clear session data
-              </Button>
+                <div>
+                  <h2 className="text-2xl font-bold text-white mb-6">Security Settings</h2>
+
+                  <div className="space-y-6">
+                    <div className="bg-brand-cyan/10 border border-brand-cyan/20 rounded-lg p-4">
+                      <p className="text-sm text-brand-cyan">
+                        <strong>Data Encryption:</strong> Your data is encrypted at rest and in transit
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.security.twoFactorAuth}
+                          onChange={(e) =>
+                            handleSettingChange("security", "twoFactorAuth", e.target.checked)
+                          }
+                          className="w-5 h-5 rounded"
+                        />
+                        <span className="text-white font-medium">Two-Factor Authentication</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.security.dataEncryption}
+                          onChange={(e) =>
+                            handleSettingChange("security", "dataEncryption", e.target.checked)
+                          }
+                          className="w-5 h-5 rounded"
+                        />
+                        <span className="text-white font-medium">End-to-End Encryption</span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block">
+                        <span className="text-sm font-semibold text-white mb-2 block">
+                          Session Timeout (minutes)
+                        </span>
+                        <input
+                          type="number"
+                          value={settings.security.sessionTimeout}
+                          onChange={(e) =>
+                            handleSettingChange(
+                              "security",
+                              "sessionTimeout",
+                              Number(e.target.value)
+                            )
+                          }
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-brand-cyan focus:outline-none"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Default Content for other sections */}
+            {!["general", "ai", "display", "security"].includes(activeSection) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="glass p-8 text-center py-16"
+              >
+                <p className="text-ink-muted">
+                  Settings for this section coming soon...
+                </p>
+              </motion.div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleReset}
+                disabled={!hasChanges}
+                className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold transition disabled:opacity-50 flex items-center gap-2"
+              >
+                <RotateCw className="w-4 h-4" />
+                Reset
+              </button>
+              <div className="flex-1" />
+              <button
+                onClick={handleSave}
+                disabled={!hasChanges}
+                className="px-6 py-3 rounded-lg bg-brand-cyan/20 hover:bg-brand-cyan/30 border border-brand-cyan/50 text-brand-cyan font-bold transition disabled:opacity-50 flex items-center gap-2"
+              >
+                <Save className="w-4 h-4" />
+                Save Changes
+              </button>
             </div>
-          </CardBody>
-        </Card>
-      </section>
-    </>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

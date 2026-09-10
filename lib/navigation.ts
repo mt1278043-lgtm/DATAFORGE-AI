@@ -8,6 +8,10 @@ import {
   ShieldCheck,
   Sparkles,
   Wand2,
+  BarChart3,
+  BookOpen,
+  Network,
+  Play,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -68,6 +72,37 @@ export const DASHBOARD_NAV: NavItem[] = [
     href: "/dashboard/reports",
     icon: FileBarChart,
     description: "Generate an executive-ready report",
+  },
+  {
+    label: "Executive Mode",
+    href: "/dashboard/executive",
+    icon: BarChart3,
+    description: "High-level business intelligence for decision makers",
+  },
+  {
+    label: "Analyst Mode",
+    href: "/dashboard/analyst",
+    icon: Database,
+    description: "Deep data investigation and statistical analysis",
+  },
+  {
+    label: "Correlations",
+    href: "/dashboard/correlations",
+    icon: Network,
+    description: "Explore relationships between variables",
+  },
+  {
+    label: "Data Story",
+    href: "/dashboard/story",
+    icon: BookOpen,
+    description: "Visual narrative of your data insights",
+  },
+  {
+    label: "Interactive Demo",
+    href: "/dashboard/demo",
+    icon: Play,
+    description: "See DataForge in action",
+    badge: "NEW",
   },
   {
     label: "Settings",
