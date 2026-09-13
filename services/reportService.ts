@@ -1,4 +1,4 @@
-import type { Dataset, DataInsight, DataQuality } from "@/types";
+import type { Dataset, Insight, QualityReport } from "@/types";
 
 export interface ExecutiveSummary {
   overview: string;
@@ -26,28 +26,28 @@ export interface ReportData {
 
 export function generateExecutiveSummary(
   dataset: Dataset,
-  insights: DataInsight[],
-  quality: DataQuality
+  insights: Insight[],
+  quality: QualityReport
 ): ExecutiveSummary {
   // Generate AI-powered summary from real data only
   const numericCols = dataset.columns.filter((c) => c.type === "numeric").length;
   const categoricalCols = dataset.columns.filter((c) => c.type === "categorical").length;
 
-  const overview = `This report analyzes ${dataset.name || "a dataset"} containing ${dataset.rowCount.toLocaleString()} records across ${dataset.columnCount} columns (${numericCols} numeric, ${categoricalCols} categorical). The dataset has an overall quality score of ${quality.overallScore}% with ${quality.completenessScore.toFixed(0)}% completeness and ${quality.validityScore.toFixed(0)}% validity.`;
+  const overview = `This report analyzes ${dataset.meta.name || "a dataset"} containing ${dataset.rowCount.toLocaleString()} records across ${dataset.columnCount} columns (${numericCols} numeric, ${categoricalCols} categorical). The dataset has a quality score of ${quality.score}% with ${quality.missingValues} missing values and ${quality.invalidValues} invalid entries.`;
 
   const keyFindings = [
-    `Dataset contains ${dataset.rowCount.toLocaleString()} records with ${quality.duplicateRowsCount} duplicate rows identified`,
-    `Data quality score of ${quality.overallScore}% indicates ${quality.overallScore > 80 ? "strong data integrity" : "room for improvement in data quality"}`,
+    `Dataset contains ${dataset.rowCount.toLocaleString()} records with ${quality.duplicateRows} duplicate rows identified`,
+    `Data quality score of ${quality.score}% indicates ${quality.score > 80 ? "strong data integrity" : "room for improvement in data quality"}`,
     `${numericCols} numeric columns identified for statistical analysis`,
-    ...insights.slice(0, 2).map((i) => i.description),
+    ...insights.slice(0, 2).map((i) => i.summary),
   ];
 
   const recommendations = [
-    quality.duplicateRowsCount > 0
-      ? `Address ${quality.duplicateRowsCount} duplicate records to improve data quality`
+    quality.duplicateRows > 0
+      ? `Address ${quality.duplicateRows} duplicate records to improve data quality`
       : "Dataset shows minimal duplication - maintain current data hygiene practices",
-    quality.totalMissingCells > 0
-      ? `Investigate ${quality.totalMissingCells} missing values across the dataset`
+    quality.missingValues > 0
+      ? `Investigate ${quality.missingValues} missing values across the dataset`
       : "Complete data coverage across all fields",
     `Leverage ${numericCols} numeric variables for predictive modeling and forecasting`,
     "Continue monitoring data quality metrics on a regular basis",
@@ -63,8 +63,8 @@ export function generateExecutiveSummary(
 
 export function generateReportData(
   dataset: Dataset,
-  insights: DataInsight[],
-  quality: DataQuality
+  insights: Insight[],
+  quality: QualityReport
 ): ReportData {
   const executiveSummary = generateExecutiveSummary(dataset, insights, quality);
 
@@ -77,15 +77,15 @@ export function generateReportData(
   }));
 
   return {
-    title: `${dataset.name || "Dataset"} Analysis Report`,
+    title: `${dataset.meta.name || "Dataset"} Analysis Report`,
     generatedDate: new Date(),
-    datasetName: dataset.name || "Unnamed Dataset",
+    datasetName: dataset.meta.name || "Unnamed Dataset",
     datasetRows: dataset.rowCount,
     datasetColumns: dataset.columnCount,
     executiveSummary,
     keyMetrics,
-    qualityScore: quality.overallScore,
-    insights: insights.slice(0, 5).map((i) => i.description),
+    qualityScore: quality.score,
+    insights: insights.slice(0, 5).map((i) => i.summary),
   };
 }
 

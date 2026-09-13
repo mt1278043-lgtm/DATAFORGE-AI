@@ -35,7 +35,7 @@ export default function ReportsPage() {
 
   const { dataset } = context;
   const [config, setConfig] = useState<ReportConfig>({
-    title: `${dataset.name || "Dataset"} Report`,
+    title: `${dataset.meta.name || "Dataset"} Report`,
     sections: ["cover", "toc", "executive", "charts", "kpis", "insights", "recommendations"],
     coverBranding: true,
     includeTableOfContents: true,

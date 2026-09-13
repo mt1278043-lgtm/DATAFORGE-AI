@@ -88,30 +88,30 @@ export default function AnalystMode() {
                       </span>
                     </div>
 
-                    {col.statistics && (
+                    {col.numeric && (
                       <div className="grid grid-cols-4 gap-3 text-sm">
                         <div>
                           <div className="text-ink-muted text-xs">Mean</div>
                           <div className="font-semibold text-brand-cyan">
-                            {col.statistics.mean?.toFixed(2) || "—"}
+                            {col.numeric.mean?.toFixed(2) || "—"}
                           </div>
                         </div>
                         <div>
                           <div className="text-ink-muted text-xs">Median</div>
                           <div className="font-semibold text-brand-cyan">
-                            {col.statistics.median?.toFixed(2) || "—"}
+                            {col.numeric.median?.toFixed(2) || "—"}
                           </div>
                         </div>
                         <div>
                           <div className="text-ink-muted text-xs">Std Dev</div>
                           <div className="font-semibold text-brand-purple">
-                            {col.statistics.stdDev?.toFixed(2) || "—"}
+                            {col.numeric.stdDev?.toFixed(2) || "—"}
                           </div>
                         </div>
                         <div>
                           <div className="text-ink-muted text-xs">Missing</div>
                           <div className="font-semibold text-danger">
-                            {col.statistics.missingCount || 0}
+                            {col.missing || 0}
                           </div>
                         </div>
                       </div>
@@ -122,7 +122,7 @@ export default function AnalystMode() {
                       <div
                         className="h-full bg-gradient-to-r from-brand-cyan to-brand-purple"
                         style={{
-                          width: `${col.statistics ? Math.min(100, (100 * col.statistics.uniqueCount) / dataset.rowCount) : 50}%`,
+                          width: `${col.numeric ? Math.min(100, (100 * col.unique) / dataset.rowCount) : 50}%`,
                         }}
                       />
                     </div>
@@ -195,46 +195,26 @@ export default function AnalystMode() {
               transition={{ delay: 0.2 }}
               className="glass p-8 space-y-4 text-center"
             >
-              <div className="text-6xl font-bold text-brand-cyan">{quality.overallScore}%</div>
+              <div className="text-6xl font-bold text-brand-cyan">{quality.score}%</div>
               <p className="text-ink-muted">Data Quality Score</p>
 
               <div className="space-y-3 pt-4 border-t border-white/10 text-left">
-                <div className="flex justify-between text-sm">
-                  <span className="text-ink-muted">Completeness</span>
-                  <span className="font-semibold text-white">
-                    {Math.round(quality.completenessScore)}%
-                  </span>
-                </div>
-                <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-success"
-                    style={{ width: `${quality.completenessScore}%` }}
-                  />
-                </div>
-
-                <div className="flex justify-between text-sm pt-3">
-                  <span className="text-ink-muted">Validity</span>
-                  <span className="font-semibold text-white">{Math.round(quality.validityScore)}%</span>
-                </div>
-                <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-success"
-                    style={{ width: `${quality.validityScore}%` }}
-                  />
-                </div>
-
-                <div className="flex justify-between text-sm pt-3">
-                  <span className="text-ink-muted">Consistency</span>
-                  <span className="font-semibold text-white">
-                    {Math.round(quality.consistencyScore)}%
-                  </span>
-                </div>
-                <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-success"
-                    style={{ width: `${quality.consistencyScore}%` }}
-                  />
-                </div>
+                {quality.dimensions.slice(0, 3).map((dim) => (
+                  <div key={dim.key}>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-ink-muted">{dim.label}</span>
+                      <span className="font-semibold text-white">
+                        {Math.round(dim.score)}%
+                      </span>
+                    </div>
+                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-success"
+                        style={{ width: `${dim.score}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </motion.div>
 
@@ -259,11 +239,11 @@ export default function AnalystMode() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-ink-muted">Duplicate Rows</span>
-                  <span className="font-semibold text-danger">{quality.duplicateRowsCount}</span>
+                  <span className="font-semibold text-danger">{quality.duplicateRows}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-ink-muted">Missing Values</span>
-                  <span className="font-semibold text-danger">{quality.totalMissingCells}</span>
+                  <span className="font-semibold text-danger">{quality.missingValues}</span>
                 </div>
               </div>
             </motion.div>
@@ -286,7 +266,7 @@ export default function AnalystMode() {
                       <span className="text-brand-cyan mt-1">→</span>
                       <div>
                         <p className="font-medium text-white">{insight.title}</p>
-                        <p className="text-xs text-ink-muted mt-1">{insight.description}</p>
+                        <p className="text-xs text-ink-muted mt-1">{insight.summary}</p>
                       </div>
                     </div>
                   ))}
