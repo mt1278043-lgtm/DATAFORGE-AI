@@ -8,11 +8,13 @@ import { Download, Share2 } from "lucide-react";
 
 export default function DataStoryPage() {
   const context = useContext(DatasetContext);
-  if (!context) return null;
 
-  const { dataset, insights, quality } = context;
+  const story = useMemo(
+    () => (context ? generateDataStory(context.dataset, context.insights, context.quality) : null),
+    [context]
+  );
 
-  const story = useMemo(() => generateDataStory(dataset, insights, quality), [dataset, insights, quality]);
+  if (!context || !story) return null;
 
   return (
     <div className="min-h-screen bg-base p-4 sm:p-8">
@@ -23,7 +25,7 @@ export default function DataStoryPage() {
             <div className="space-y-2">
               <h1 className="text-4xl font-bold text-white">Data Story</h1>
               <p className="text-lg text-ink-muted">
-                Your data tells a story. Here's what the numbers reveal.
+                Your data tells a story. Here&apos;s what the numbers reveal.
               </p>
             </div>
 

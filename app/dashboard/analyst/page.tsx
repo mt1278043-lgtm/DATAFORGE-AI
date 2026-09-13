@@ -1,20 +1,18 @@
 "use client";
 
 import { useContext, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Filter, BarChart3, Database, Zap, Eye, EyeOff } from "lucide-react";
+import { motion } from "framer-motion";
+import { Filter, Database, Zap, Eye, EyeOff } from "lucide-react";
 import { DatasetContext } from "@/hooks/useDataset";
 
 export default function AnalystMode() {
+  const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
+  const [showCorrelations, setShowCorrelations] = useState(true);
+
   const context = useContext(DatasetContext);
   if (!context) return null;
 
   const { dataset, quality, insights } = context;
-  const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
-  const [showCorrelations, setShowCorrelations] = useState(true);
-
-  // Find numeric columns for correlation analysis
-  const numericCols = dataset.columns.filter((col) => col.type === "numeric");
 
   return (
     <div className="min-h-screen bg-base p-4 sm:p-8">

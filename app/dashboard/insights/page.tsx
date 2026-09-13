@@ -20,7 +20,7 @@ const CATEGORY_TABS: { value: InsightCategory | "all"; label: string }[] = [
 ];
 
 export default function InsightsPage() {
-  const { dataset, insights } = useDataset();
+  const { insights } = useDataset();
 
   const [tab, setTab] = useState<string>("all");
 

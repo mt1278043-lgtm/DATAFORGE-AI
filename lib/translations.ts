@@ -73,11 +73,11 @@ export type Language = keyof typeof translations;
 
 export function getTranslation(lang: Language, key: string): string {
   const parts = key.split(".");
-  let value: any = translations[lang];
+  let value: unknown = translations[lang];
 
   for (const part of parts) {
-    value = value?.[part];
+    value = (value as Record<string, unknown>)?.[part];
   }
 
-  return value || key;
+  return (value as string) || key;
 }

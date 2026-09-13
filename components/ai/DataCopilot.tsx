@@ -5,9 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   MessageCircle,
   Send,
-  Lightbulb,
   X,
-  ChevronDown,
   Sparkles,
 } from "lucide-react";
 

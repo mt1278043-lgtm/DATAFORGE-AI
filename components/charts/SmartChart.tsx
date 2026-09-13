@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Sparkles, ChevronDown, X } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface ChartData {
   name: string;
   value: number;
-  [key: string]: any;
+  [key: string]: string | number | boolean;
 }
 
 interface SmartChartProps {

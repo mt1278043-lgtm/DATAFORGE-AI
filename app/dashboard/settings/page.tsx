@@ -8,10 +8,7 @@ import {
   Lock,
   Zap,
   Database,
-  Upload,
   Eye,
-  Moon,
-  Monitor,
   Save,
   RotateCw,
 } from "lucide-react";
@@ -134,7 +131,7 @@ export default function SettingsPage() {
     },
   });
 
-  const handleSettingChange = (section: keyof Settings, key: string, value: any) => {
+  const handleSettingChange = (section: keyof Settings, key: string, value: string | number | boolean) => {
     setSettings((prev) => ({
       ...prev,
       [section]: {

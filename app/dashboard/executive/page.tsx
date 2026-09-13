@@ -14,10 +14,7 @@ interface ExecutiveMetric {
   icon: React.ReactNode;
 }
 
-function extractExecutiveMetrics(dataset: Dataset): ExecutiveMetric[] {
-  // Find numeric columns for key metrics
-  const numericCols = dataset.columns.filter((col) => col.type === "numeric");
-
+function extractExecutiveMetrics(_dataset: Dataset): ExecutiveMetric[] {
   const metrics: ExecutiveMetric[] = [
     {
       title: "Total Revenue",
@@ -54,10 +51,13 @@ function extractExecutiveMetrics(dataset: Dataset): ExecutiveMetric[] {
 
 export default function ExecutiveMode() {
   const context = useContext(DatasetContext);
-  if (!context) return null;
 
-  const { dataset } = context;
-  const metrics = useMemo(() => extractExecutiveMetrics(dataset), [dataset]);
+  const metrics = useMemo(
+    () => (context ? extractExecutiveMetrics(context.dataset) : []),
+    [context]
+  );
+
+  if (!context) return null;
 
   return (
     <div className="min-h-screen bg-base p-4 sm:p-8">

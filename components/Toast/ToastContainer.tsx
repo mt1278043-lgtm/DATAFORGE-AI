@@ -14,16 +14,14 @@ export interface Toast {
   duration?: number;
 }
 
-interface ToastContextType {
-  toasts: Toast[];
-  addToast: (toast: Omit<Toast, "id">) => void;
-  removeToast: (id: string) => void;
-}
-
 let toastIdCounter = 0;
 
 export const useToast = () => {
   const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   const addToast = useCallback((toast: Omit<Toast, "id">) => {
     const id = `toast-${toastIdCounter++}`;
@@ -38,11 +36,7 @@ export const useToast = () => {
       );
       return () => clearTimeout(timer);
     }
-  }, []);
-
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+  }, [removeToast]);
 
   return { toasts, addToast, removeToast };
 };
@@ -126,7 +120,7 @@ function Toast({ toast, onClose }: ToastProps) {
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const { toasts, addToast, removeToast } = useToast();
+  const { toasts, removeToast } = useToast();
 
   return (
     <>
