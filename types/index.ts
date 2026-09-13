@@ -265,27 +265,6 @@ export interface PredictionResult {
   equation?: string;
 }
 
-/* -------------------------------------------------------------------------- */
-/*  AI assistant                                                              */
-/* -------------------------------------------------------------------------- */
-
-export type ChatRole = "user" | "assistant" | "system";
-
-export interface ChatMessage {
-  id: string;
-  role: ChatRole;
-  content: string;
-  createdAt: number;
-  mode?: AiMode;
-}
-
-export type AiMode = "openai" | "demo";
-
-export interface AiChatResponse {
-  message: string;
-  mode: AiMode;
-  suggestions?: string[];
-}
 
 /* -------------------------------------------------------------------------- */
 /*  Reports                                                                   */
@@ -303,7 +282,6 @@ export interface GeneratedReport {
   subtitle: string;
   generatedAt: string;
   datasetName: string;
-  mode: AiMode;
   kpis: { label: string; value: string; delta?: string }[];
   sections: ReportSection[];
 }
