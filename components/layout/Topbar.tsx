@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, Command, Menu, Search, Sparkles } from "lucide-react";
+import { Bell, Command, Menu, Search } from "lucide-react";
 
-import { Badge } from "@/components/ui/Badge";
-import { useAiStatus } from "@/hooks/useAiStatus";
 import { useDataset } from "@/hooks/useDataset";
 import { DASHBOARD_NAV } from "@/lib/navigation";
 import { formatRelativeTime } from "@/lib/format";
@@ -27,7 +25,6 @@ interface Notification {
 export function Topbar({ onOpenNav }: TopbarProps) {
   const router = useRouter();
   const { dataset, quality, insights } = useDataset();
-  const { status } = useAiStatus();
 
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
@@ -162,16 +159,6 @@ export function Topbar({ onOpenNav }: TopbarProps) {
         </div>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          {/* AI status --------------------------------------------------- */}
-          <Badge
-            tone={status.mode === "openai" ? "success" : "violet"}
-            dot
-            pulse
-            className="hidden sm:inline-flex"
-          >
-            {status.mode === "openai" ? "AI Engine Online" : "Demo AI Engine"}
-          </Badge>
-
           {/* Notifications ----------------------------------------------- */}
           <div className="relative" ref={notificationsRef}>
             <button
@@ -245,13 +232,6 @@ export function Topbar({ onOpenNav }: TopbarProps) {
         </div>
       </div>
 
-      {/* Mobile AI status strip */}
-      <div className="flex items-center gap-2 border-t border-white/[0.05] px-4 py-2 sm:hidden">
-        <Sparkles className="h-3 w-3 text-brand-purple" />
-        <span className="text-[11px] text-ink-muted">
-          {status.mode === "openai" ? "AI Engine Online" : "Demo AI Engine"}
-        </span>
-      </div>
     </header>
   );
 }

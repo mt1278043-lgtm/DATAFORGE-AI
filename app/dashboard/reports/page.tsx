@@ -2,7 +2,8 @@
 
 import { useContext, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Download, Eye, Settings, GripVertical, Plus, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { FileText, Download, Eye, GripVertical, X } from "lucide-react";
 import { DatasetContext } from "@/hooks/useDataset";
 
 type ReportSection = "cover" | "toc" | "executive" | "charts" | "kpis" | "quality" | "insights" | "story" | "forecasts" | "recommendations";
@@ -16,7 +17,7 @@ interface ReportConfig {
   colorScheme: "professional" | "corporate" | "minimal";
 }
 
-const AVAILABLE_SECTIONS: { id: ReportSection; label: string; description: string; icon: any }[] = [
+const AVAILABLE_SECTIONS: { id: ReportSection; label: string; description: string; icon: LucideIcon }[] = [
   { id: "cover", label: "Cover Page", description: "Professional report cover", icon: FileText },
   { id: "toc", label: "Table of Contents", description: "Auto-generated TOC", icon: FileText },
   { id: "executive", label: "Executive Summary", description: "AI-generated summary from data", icon: FileText },
@@ -31,11 +32,9 @@ const AVAILABLE_SECTIONS: { id: ReportSection; label: string; description: strin
 
 export default function ReportsPage() {
   const context = useContext(DatasetContext);
-  if (!context) return null;
 
-  const { dataset } = context;
   const [config, setConfig] = useState<ReportConfig>({
-    title: `${dataset.meta.name || "Dataset"} Report`,
+    title: `${context?.dataset.meta.name || "Dataset"} Report`,
     sections: ["cover", "toc", "executive", "charts", "kpis", "insights", "recommendations"],
     coverBranding: true,
     includeTableOfContents: true,
@@ -46,6 +45,10 @@ export default function ReportsPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [draggedSection, setDraggedSection] = useState<string | null>(null);
+
+  if (!context) return null;
+
+  const { dataset } = context;
 
   const handleAddSection = (section: ReportSection) => {
     if (!config.sections.includes(section)) {
@@ -174,7 +177,7 @@ export default function ReportsPage() {
                   <span className="text-sm font-semibold text-white mb-2 block">Color Scheme</span>
                   <select
                     value={config.colorScheme}
-                    onChange={(e) => setConfig({ ...config, colorScheme: e.target.value as any })}
+                    onChange={(e) => setConfig({ ...config, colorScheme: e.target.value as "professional" | "corporate" | "minimal" })}
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-cyan"
                   >
                     <option value="professional">Professional (Blue/Gray)</option>
@@ -196,7 +199,7 @@ export default function ReportsPage() {
                     <p>Add sections from the list below</p>
                   </div>
                 ) : (
-                  config.sections.map((section, idx) => {
+                  config.sections.map((section) => {
                     const sectionInfo = AVAILABLE_SECTIONS.find((s) => s.id === section);
                     return (
                       <motion.div

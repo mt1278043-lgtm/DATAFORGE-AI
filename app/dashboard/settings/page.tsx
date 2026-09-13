@@ -6,12 +6,8 @@ import {
   Settings,
   Bell,
   Lock,
-  Zap,
   Database,
-  Upload,
   Eye,
-  Moon,
-  Monitor,
   Save,
   RotateCw,
 } from "lucide-react";
@@ -29,12 +25,6 @@ const SETTINGS_SECTIONS: SettingsSection[] = [
     label: "General",
     icon: <Settings className="w-5 h-5" />,
     description: "Basic app settings",
-  },
-  {
-    id: "ai",
-    label: "AI Engine",
-    icon: <Zap className="w-5 h-5" />,
-    description: "AI model configuration",
   },
   {
     id: "data",
@@ -68,12 +58,6 @@ interface Settings {
     autoSave: boolean;
     dataRetention: "30days" | "90days" | "1year" | "forever";
   };
-  ai: {
-    engine: "openai" | "local";
-    confidenceThreshold: number;
-    enableAutoInsights: boolean;
-    detailedAnalysis: boolean;
-  };
   data: {
     allowDataCollection: boolean;
     allowAnalytics: boolean;
@@ -102,15 +86,9 @@ export default function SettingsPage() {
 
   const [settings, setSettings] = useState<Settings>({
     general: {
-      appName: "DataForge AI",
+      appName: "DataForge",
       autoSave: true,
       dataRetention: "1year",
-    },
-    ai: {
-      engine: "local",
-      confidenceThreshold: 75,
-      enableAutoInsights: true,
-      detailedAnalysis: true,
     },
     data: {
       allowDataCollection: true,
@@ -134,7 +112,7 @@ export default function SettingsPage() {
     },
   });
 
-  const handleSettingChange = (section: keyof Settings, key: string, value: any) => {
+  const handleSettingChange = (section: keyof Settings, key: string, value: string | number | boolean) => {
     setSettings((prev) => ({
       ...prev,
       [section]: {
@@ -255,89 +233,6 @@ export default function SettingsPage() {
                           <option value="1year">1 Year</option>
                           <option value="forever">Forever</option>
                         </select>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* AI Engine Settings */}
-            {activeSection === "ai" && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass p-8 space-y-6"
-              >
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-6">AI Engine Configuration</h2>
-
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block">
-                        <span className="text-sm font-semibold text-white mb-2 block">AI Engine</span>
-                        <select
-                          value={settings.ai.engine}
-                          onChange={(e) => handleSettingChange("ai", "engine", e.target.value)}
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-brand-cyan focus:outline-none"
-                        >
-                          <option value="local">Local (Default)</option>
-                          <option value="openai">OpenAI GPT-4</option>
-                        </select>
-                        <p className="text-xs text-ink-muted mt-2">
-                          Local mode works offline. OpenAI mode requires API key.
-                        </p>
-                      </label>
-                    </div>
-
-                    <div>
-                      <label className="block">
-                        <span className="text-sm font-semibold text-white mb-2 block">
-                          Confidence Threshold: {settings.ai.confidenceThreshold}%
-                        </span>
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={settings.ai.confidenceThreshold}
-                          onChange={(e) =>
-                            handleSettingChange(
-                              "ai",
-                              "confidenceThreshold",
-                              Number(e.target.value)
-                            )
-                          }
-                          className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
-                        />
-                        <p className="text-xs text-ink-muted mt-2">
-                          Only show insights with confidence above this threshold
-                        </p>
-                      </label>
-                    </div>
-
-                    <div className="space-y-3">
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={settings.ai.enableAutoInsights}
-                          onChange={(e) =>
-                            handleSettingChange("ai", "enableAutoInsights", e.target.checked)
-                          }
-                          className="w-5 h-5 rounded"
-                        />
-                        <span className="text-white font-medium">Auto-generate Insights</span>
-                      </label>
-
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={settings.ai.detailedAnalysis}
-                          onChange={(e) =>
-                            handleSettingChange("ai", "detailedAnalysis", e.target.checked)
-                          }
-                          className="w-5 h-5 rounded"
-                        />
-                        <span className="text-white font-medium">Enable Detailed Analysis</span>
                       </label>
                     </div>
                   </div>
@@ -481,7 +376,7 @@ export default function SettingsPage() {
             )}
 
             {/* Default Content for other sections */}
-            {!["general", "ai", "display", "security"].includes(activeSection) && (
+            {!["general", "display", "security"].includes(activeSection) && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

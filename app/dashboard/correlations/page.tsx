@@ -2,7 +2,6 @@
 
 import { useContext, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { DatasetContext } from "@/hooks/useDataset";
 
 interface CorrelationPair {
@@ -14,8 +13,8 @@ interface CorrelationPair {
 }
 
 // Simulate correlation calculation
-function calculateCorrelations(dataset: any): CorrelationPair[] {
-  const numeric = dataset.columns.filter((c: any) => c.type === "numeric");
+function calculateCorrelations(dataset: { columns: Array<{ type: string; name: string }> }): CorrelationPair[] {
+  const numeric = dataset.columns.filter((c) => c.type === "numeric");
 
   const pairs: CorrelationPair[] = [];
 
@@ -44,16 +43,19 @@ function calculateCorrelations(dataset: any): CorrelationPair[] {
 }
 
 export default function CorrelationExplorer() {
-  const context = useContext(DatasetContext);
-  if (!context) return null;
-
-  const { dataset } = context;
   const [selectedPair, setSelectedPair] = useState<CorrelationPair | null>(null);
   const [filterStrength, setFilterStrength] = useState<"all" | "strong" | "moderate" | "weak">(
     "all"
   );
 
-  const correlations = useMemo(() => calculateCorrelations(dataset), [dataset]);
+  const context = useContext(DatasetContext);
+
+  const correlations = useMemo(
+    () => (context ? calculateCorrelations(context.dataset) : []),
+    [context]
+  );
+
+  if (!context) return null;
 
   const filtered =
     filterStrength === "all"

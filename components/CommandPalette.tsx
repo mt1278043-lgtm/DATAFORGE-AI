@@ -194,7 +194,7 @@ export function CommandPalette() {
                         </div>
                         {filtered
                           .filter((c) => c.category === category)
-                          .map((cmd, idx) => {
+                          .map((cmd) => {
                             const commandIndex = filtered.indexOf(cmd);
                             const isSelected = commandIndex === selectedIndex;
 
