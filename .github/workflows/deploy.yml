@@ -2,9 +2,9 @@ name: Deploy to Vercel
 
 on:
   push:
-    branches: [main, claude/nifty-shannon-b0qlqz]
+    branches: [main, claude/lucid-planck-6zcv7l]
   pull_request:
-    branches: [main, claude/nifty-shannon-b0qlqz]
+    branches: [main, claude/lucid-planck-6zcv7l]
 
 jobs:
   build:
@@ -30,7 +30,7 @@ jobs:
       run: npm run lint
 
     - name: Run type check
-      run: npm run type-check
+      run: npm run typecheck
 
     - name: Build
       run: npm run build
