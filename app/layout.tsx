@@ -5,7 +5,9 @@ import { APP_DESCRIPTION, APP_NAME, APP_TAGLINE } from "@/lib/constants";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  metadataBase: process.env.NEXT_PUBLIC_APP_URL
+    ? new URL(process.env.NEXT_PUBLIC_APP_URL)
+    : undefined,
   title: {
     default: `${APP_NAME} - ${APP_TAGLINE}`,
     template: `%s | ${APP_NAME}`,
